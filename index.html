@@ -5,6 +5,11 @@
     <title>小羊工作量過載了</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lilita+One&family=Titan+One&display=swap');
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body{
             background-image: url("./Element/space.jpeg");
             background-repeat: no-repeat;
@@ -28,6 +33,7 @@
             font-size: 3vh;
             color: white;
             font-family: "Lilita One", sans-serif;
+            line-height: 5vh;
         }
 
         @keyframes move {
@@ -50,6 +56,8 @@
             position: absolute;
             top: 10%;
             left: 70%;
+            max-width: 100%;
+            height: auto;
 
             animation: move 4s linear infinite;
 
@@ -58,16 +66,19 @@
             position: absolute;
             top: 60%;
             left: 50%;
-
+            max-width: 100%;
+            height: auto;
             animation: rotate02 10s linear infinite alternate;
         }
         .img03{
             position: absolute;
             top: 35%;
             left: 1%;
-
+            max-width: 100%;
+            height: auto;
             animation: rotate01 100s linear infinite;
         }
+
 
 
 
@@ -77,15 +88,15 @@
 
             .img01{
                 position: absolute;
-                top: 1px;
+                top: 1%;
                 left: 75%;
-                width: 40%;
-                height: 20%;
+                max-width: 50%;
+                height: auto;
 
             }
             .img02{
-                width: 50%;
-                height: 30%;
+                max-width: 50%;
+                height: auto;
                 position: absolute;
                 top: 70%;
                 left: 50%;
@@ -93,8 +104,8 @@
 
             .img03{
                 position: absolute;
-                width: 20%;
-                height: 10%;
+                max-width: 50%;
+                height: auto;
                 top: 25%;
                 left: 3%;
             }
