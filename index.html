@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小羊工作量過載了</title>
+    <title>小羊們的工作量過載了</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lilita+One&family=Titan+One&display=swap');
         *{
@@ -56,7 +56,7 @@
 
         .img01{
             position: absolute;
-            top: 20%;
+            top: 10%;
             left: 70%;
             max-width: 100%;
             height: auto;
@@ -80,10 +80,25 @@
             height: auto;
             animation: rotate01 100s linear infinite;
         }
-
-        @media screen and (max-width: 800px) {
+        @media screen and (max-width: 930px) {
             .img01{
-                max-width: 38%;
+                top:23%;
+                max-width: 30%;
+                height: auto;
+            }
+            .img03{
+                top: 40%;
+                max-width: 30%;
+                height: auto;
+            }
+            .img02{
+                left: 40%;
+            }
+
+        }
+        @media screen and (max-width: 600px) {
+            .img01{
+                max-width: 30%;
                 height: auto;
                 top: 0%;
                 left: 53%;
@@ -92,13 +107,27 @@
                 max-width: 25%;
                 height: auto;
                 left: 0%;
-                top: 38%;
+                top: 34%;
+            }
+            .img02{
+                max-width: 60%;
+                height: auto;
+                top: 60%;
+                left: 30%;
+            }
+        }
+        @media screen and (max-width: 430px) {
+            .img01{
+                max-width: 45%;
+                height: auto;
+            }
+            .img03{
+                top: 36%;
             }
             .img02{
                 max-width: 100%;
                 height: auto;
-                top: 60%;
-                left: 30%;
+                top: 63%;
             }
         }
     </style>
@@ -108,15 +137,14 @@
 
     <h1>Sorry, please wait.</h1>
     <div class="text">
-        <p>We’re on vacation for now.</p>
+        <p>Give us some freedom.</p>
         <p>We’re all floating.</p>
         <p>Please wait until we return to Earth.</p>
     </div>
-    <div class="AllOfSheep">
-        <img class="img01" src="./Element/sheep1.png" alt="sheep1">
-        <img class="img02" src="./Element/sheep2.png" alt="sheep2">
-        <img class="img03" src="./Element/sheep3.png" alt="sheep3">
-    </div>
+    <img class="img01" src="./Element/sheep1.png" alt="sheep1">
+    <img class="img02" src="./Element/sheep2.png" alt="sheep2">
+    <img class="img03" src="./Element/sheep3.png" alt="sheep3">
+
 
 
 
