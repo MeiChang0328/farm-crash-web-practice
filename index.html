@@ -6,13 +6,15 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Lilita+One&family=Titan+One&display=swap');
         body{
-
             background-image: url("./Element/space.jpeg");
             background-repeat: no-repeat;
             background-attachment: fixed;
             background-position: center;
             background-size: cover;
             margin: 0 ;
+            
+
+
         }
         h1{
             text-align: center;
@@ -44,18 +46,18 @@
             100% { transform: rotate(60deg)}
         }
 
-        .sheep01{
+        .img01{
             position: absolute;
             top: 10%;
             left: 70%;
 
         }
-        .sheep02{
+        .img02{
             position: absolute;
-            top: 50%;
+            top: 60%;
             left: 50%;
         }
-        .sheep03{
+        .img03{
             position: absolute;
             top: 30%;
             left: 5%;
@@ -77,6 +79,30 @@
             height: 50vh;
             animation: rotate02 10s linear infinite alternate;
         }
+        @media (max-width: 2000px) {
+
+            .img01{
+                width: 40%;
+                height: 15%;
+                top: 20%;
+            }
+            .img02{
+                width: 50%;
+                height: 20%;
+            }
+
+            .img03{
+                width: 30%;
+                height: 10%;
+                top: 35%;
+            }
+
+            .img02{
+                position: absolute;
+                top: 60%;
+                left: 70%;
+            }
+        }
 
     </style>
 </head>
@@ -89,9 +115,9 @@
         <p>We’re all floating.</p>
         <p>Please wait until we return to Earth.</p>
     </div>
-    <div class="sheep01"><img class="img01" src="./Element/sheep1.png" alt="sheep1"></div>
-    <div class="sheep02"><img class="img02" src="./Element/sheep2.png" alt="sheep2"></div>
-    <div class="sheep03"><img class="img03" src="./Element/sheep3.png" alt="sheep3"></div>
+    <img class="img01" src="./Element/sheep1.png" alt="sheep1">
+    <img class="img02" src="./Element/sheep2.png" alt="sheep2">
+    <img class="img03" src="./Element/sheep3.png" alt="sheep3">
 
 
 
