@@ -51,42 +51,37 @@
             top: 10%;
             left: 70%;
 
+            animation: move 4s linear infinite;
+
         }
         .img02{
             position: absolute;
             top: 60%;
             left: 50%;
+
+            animation: rotate02 10s linear infinite alternate;
         }
         .img03{
             position: absolute;
             top: 30%;
             left: 5%;
-        }
 
-        .img01{
-            width: 50vh;
-            height: 50vh;
-            animation: move 4s linear infinite;
-        }
-        .img03{
-            width: 50vh;
-            height: 50vh;
             animation: rotate01 100s linear infinite;
         }
 
-        .img02{
-            width: 50vh;
-            height: 50vh;
-            animation: rotate02 10s linear infinite alternate;
-        }
-        @media (max-width: 2000px) {
+
+
+
+
+        @media (max-width: 750px) {
 
             .img01{
                 position: absolute;
-                width: 40%;
-                height: 15%;
                 top: 3%;
                 left: 75%;
+                width: 40%;
+                height: 15%;
+
             }
             .img02{
                 width: 50%;
@@ -118,9 +113,11 @@
         <p>We’re all floating.</p>
         <p>Please wait until we return to Earth.</p>
     </div>
+
     <img class="img01" src="./Element/sheep1.png" alt="sheep1">
     <img class="img02" src="./Element/sheep2.png" alt="sheep2">
     <img class="img03" src="./Element/sheep3.png" alt="sheep3">
+
 
 
 
