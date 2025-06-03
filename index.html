@@ -272,7 +272,7 @@
     const timerElem = document.createElement('div');
     timerElem.id = 'timer';
     timerElem.style.position = 'fixed';
-    timerElem.style.top = '10px';
+    timerElem.style.bottom = '10px';
     timerElem.style.left = '10px';
     timerElem.style.color = 'yellow';
     timerElem.style.fontSize = '2em';
@@ -284,7 +284,8 @@
     startBtn.textContent = '開始遊戲';
     startBtn.style.position = 'fixed';
     startBtn.style.top = '10px';
-    startBtn.style.right = '10px';
+    startBtn.style.left = '10px';
+    startBtn.style.right = '';
     startBtn.style.fontSize = '2em';
     startBtn.style.zIndex = '10';
     startBtn.style.background = '#fff8';
@@ -292,6 +293,55 @@
     startBtn.style.borderRadius = '10px';
     startBtn.style.cursor = 'pointer';
     document.body.appendChild(startBtn);
+
+    // 建立一個右上角的容器，讓暫停與重新遊戲按鈕並排
+    const rightBtnGroup = document.createElement('div');
+    rightBtnGroup.style.position = 'fixed';
+    rightBtnGroup.style.top = '10px';
+    rightBtnGroup.style.right = '10px';
+    rightBtnGroup.style.display = 'flex';
+    rightBtnGroup.style.gap = '10px';
+    rightBtnGroup.style.zIndex = '10';
+    document.body.appendChild(rightBtnGroup);
+
+    const pauseBtn = document.createElement('button');
+    pauseBtn.textContent = '暫停';
+    pauseBtn.style.position = 'static';
+    pauseBtn.style.fontSize = '2em';
+    pauseBtn.style.background = '#fff8';
+    pauseBtn.style.border = '2px solid #fff';
+    pauseBtn.style.borderRadius = '10px';
+    pauseBtn.style.cursor = 'pointer';
+    rightBtnGroup.appendChild(pauseBtn);
+
+    const restartBtn = document.createElement('button');
+    restartBtn.textContent = '重新遊戲';
+    restartBtn.style.position = 'static';
+    restartBtn.style.fontSize = '2em';
+    restartBtn.style.background = '#fff8';
+    restartBtn.style.border = '2px solid #fff';
+    restartBtn.style.borderRadius = '10px';
+    restartBtn.style.cursor = 'pointer';
+    rightBtnGroup.appendChild(restartBtn);
+
+    let isPaused = false;
+
+    pauseBtn.addEventListener('click', function() {
+        if (!isGameRunning) return;
+        isPaused = !isPaused;
+        if (isPaused) {
+            pauseBtn.textContent = '繼續';
+        } else {
+            pauseBtn.textContent = '暫停';
+        }
+    });
+
+    restartBtn.addEventListener('click', function() {
+        if (intervalId) clearInterval(intervalId);
+        isPaused = false;
+        pauseBtn.textContent = '暫停';
+        startGame();
+    });
 
     // 排行榜功能（改為 Node.js 伺服器）
     const leaderboardElem = document.createElement('div');
@@ -353,8 +403,11 @@
         resetGame();
         isGameRunning = true;
         startBtn.disabled = true;
+        pauseBtn.disabled = false;
+        restartBtn.disabled = false;
         timerElem.textContent = '時間：' + timer;
         intervalId = setInterval(() => {
+            if (isPaused) return;
             timer--;
             timerElem.textContent = '時間：' + timer;
             if (timer <= 0) {
@@ -367,6 +420,8 @@
         isGameRunning = false;
         clearInterval(intervalId);
         startBtn.disabled = false;
+        pauseBtn.disabled = true;
+        restartBtn.disabled = false;
         timerElem.textContent = '遊戲結束！分數：' + score;
         updateLeaderboard(score);
         alert('遊戲結束！你總共點擊了 ' + score + ' 次小羊！');
@@ -375,7 +430,7 @@
     startBtn.addEventListener('click', startGame);
 
     canvas.addEventListener("click", function (event) {
-        if (!isGameRunning) return;
+        if (!isGameRunning || isPaused) return;
         const size = random(40, 200);
         const imgSrc = sheepImgs[Math.floor(Math.random() * sheepImgs.length)];
         const angle = random(0, Math.PI * 2);
@@ -395,10 +450,16 @@
 
     function loop() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (const sheep of sheeps) {
-            sheep.draw();
-            sheep.update();
-            sheep.collisionDetect(sheeps);
+        if (!isPaused) {
+            for (const sheep of sheeps) {
+                sheep.draw();
+                sheep.update();
+                sheep.collisionDetect(sheeps);
+            }
+        } else {
+            for (const sheep of sheeps) {
+                sheep.draw();
+            }
         }
         requestAnimationFrame(loop);
     }

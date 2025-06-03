@@ -1,5 +1,4 @@
 const express = require('express');
-const fs = require('fs');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
 const app = express();
@@ -20,14 +19,8 @@ db.serialize(() => {
   )`);
 });
 
-// 動態首頁（測試用，可移除）
-app.get('/', (req, res) => {
-    res.send('<h2>Sheep Game Server Running!</h2><p>API: <a href="/api/leaderboard">/api/leaderboard</a></p>');
-});
-
 // 取得排行榜
 app.get('/api/leaderboard', (req, res) => {
-    // 改為回傳前5名，且不顯示時間（前端不需要時間）
     db.all('SELECT name, score FROM scores ORDER BY score DESC LIMIT 5', (err, rows) => {
         if (err) return res.json([]);
         res.json(rows);
