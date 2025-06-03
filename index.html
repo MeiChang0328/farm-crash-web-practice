@@ -93,7 +93,6 @@
             .img02{
                 left: 40%;
             }
-
         }
         @media screen and (max-width: 600px) {
             .img01{
@@ -145,12 +144,258 @@
     <img class="img01" src="./Element/sheep1.png" alt="sheep1">
     <img class="img02" src="./Element/sheep2.png" alt="sheep2">
     <img class="img03" src="./Element/sheep3.png" alt="sheep3">
-
+    <p id="count">0</p>
 
 
 
 </body>
+<canvas style="position:fixed;top:0;left:0;z-index:0;"></canvas>
 <script>
+
+    //滑鼠點擊之後，隨機在畫面產生sheep1.png,sheep2.png,sheep3.png
+    //每次點擊會隨機產生一張圖片，並且圖片會隨機旋轉和大小
+    // 並且每一個圖片有著隨機的移動效果，都是緩慢移動或旋轉(類似animation: rotate02 10s linear infinite alternate)，持續保持移動效果;
+    //碰撞到每張圖片會彈開，並且碰撞到邊框也會反彈
+    //每次點擊會增加計數器，顯示在id="count"的元素上
+
+    const canvas = document.querySelector("canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const sheepImgs = [
+        "./Element/sheep1.png",
+        "./Element/sheep2.png",
+        "./Element/sheep3.png"
+    ];
+
+    const mp3Files = [
+        './MP3/1254.mp3',
+        './MP3/2941.mp3',
+        './MP3/325.mp3'
+    ];
+
+    function random(min, max) {
+        return Math.random() * (max - min) + min;
+    }
+
+    class Sheep {
+        constructor(x, y, velX, velY, size, imgSrc, angle, rotateSpeed) {
+            this.x = x;
+            this.y = y;
+            this.velX = velX;
+            this.velY = velY;
+            this.size = size;
+            this.img = new Image();
+            this.img.src = imgSrc;
+            this.angle = angle;
+            this.rotateSpeed = rotateSpeed;
+        }
+
+        draw() {
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.angle);
+            ctx.globalAlpha = 1;
+            ctx.drawImage(this.img, -this.size / 2, -this.size / 2, this.size, this.size);
+            ctx.restore();
+        }
+
+        update() {
+            this.x += this.velX;
+            this.y += this.velY;
+            this.angle += this.rotateSpeed;
+            // 邊界反彈
+            if (this.x + this.size / 2 >= canvas.width) {
+                this.x = canvas.width - this.size / 2;
+                this.velX = -Math.abs(this.velX);
+            }
+            if (this.x - this.size / 2 <= 0) {
+                this.x = this.size / 2;
+                this.velX = Math.abs(this.velX);
+            }
+            if (this.y + this.size / 2 >= canvas.height) {
+                this.y = canvas.height - this.size / 2;
+                this.velY = -Math.abs(this.velY);
+            }
+            if (this.y - this.size / 2 <= 0) {
+                this.y = this.size / 2;
+                this.velY = Math.abs(this.velY);
+            }
+        }
+
+        collisionDetect(sheepArray) {
+            for (const other of sheepArray) {
+                if (this === other) continue;
+                const dx = this.x - other.x;
+                const dy = this.y - other.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < this.size / 2 + other.size / 2) {
+                    // 彈開時大力一點，給雙方一個較大的瞬間推力
+                    const angle = Math.atan2(dy, dx);
+                    const overlap = (this.size / 2 + other.size / 2) - dist;
+                    const force = 0.2; // 彈開強度
+                    const pushX = Math.cos(angle) * overlap * force;
+                    const pushY = Math.sin(angle) * overlap * force;
+                    this.x += pushX;
+                    this.y += pushY;
+                    other.x -= pushX;
+                    other.y -= pushY;
+                    // 額外給速度衝擊
+                    this.velX += pushX * 0.2;
+                    this.velY += pushY * 0.2;
+                    other.velX -= pushX * 0.2;
+                    other.velY -= pushY * 0.2;
+                }
+            }
+        }
+    }
+
+    const sheeps = [];
+    let count = 0;
+    const countElem = document.getElementById("count");
+
+    // 遊戲狀態
+    let isGameRunning = false;
+    let timer = 30; // 遊戲時間(秒)
+    let intervalId = null;
+    let score = 0;
+    const timerElem = document.createElement('div');
+    timerElem.id = 'timer';
+    timerElem.style.position = 'fixed';
+    timerElem.style.top = '10px';
+    timerElem.style.left = '10px';
+    timerElem.style.color = 'yellow';
+    timerElem.style.fontSize = '2em';
+    timerElem.style.fontFamily = 'Lilita One, sans-serif';
+    timerElem.style.zIndex = '10';
+    document.body.appendChild(timerElem);
+
+    const startBtn = document.createElement('button');
+    startBtn.textContent = '開始遊戲';
+    startBtn.style.position = 'fixed';
+    startBtn.style.top = '10px';
+    startBtn.style.right = '10px';
+    startBtn.style.fontSize = '2em';
+    startBtn.style.zIndex = '10';
+    startBtn.style.background = '#fff8';
+    startBtn.style.border = '2px solid #fff';
+    startBtn.style.borderRadius = '10px';
+    startBtn.style.cursor = 'pointer';
+    document.body.appendChild(startBtn);
+
+    // 排行榜功能（改為 Node.js 伺服器）
+    const leaderboardElem = document.createElement('div');
+    leaderboardElem.id = 'leaderboard';
+    leaderboardElem.style.position = 'fixed';
+    leaderboardElem.style.bottom = '10px';
+    leaderboardElem.style.right = '10px';
+    leaderboardElem.style.background = '#fff8';
+    leaderboardElem.style.border = '2px solid #fff';
+    leaderboardElem.style.borderRadius = '10px';
+    leaderboardElem.style.padding = '10px 20px';
+    leaderboardElem.style.fontFamily = 'Lilita One, sans-serif';
+    leaderboardElem.style.fontSize = '1.2em';
+    leaderboardElem.style.zIndex = '10';
+    document.body.appendChild(leaderboardElem);
+
+    async function renderLeaderboard() {
+        try {
+            const res = await fetch('http://localhost:3000/api/leaderboard');
+            if (!res.ok) throw new Error('伺服器無回應');
+            const leaderboard = await res.json();
+            let html = '<b>排行榜</b><ol style="margin:0;padding-left:1.2em;">';
+            if (leaderboard.length === 0) {
+                html += '<li>暫無紀錄</li>';
+            } else {
+                for (const entry of leaderboard) {
+                    html += `<li>${entry.name}：${entry.score}分</li>`;
+                }
+            }
+            html += '</ol>';
+            leaderboardElem.innerHTML = html;
+        } catch (e) {
+            leaderboardElem.innerHTML = '<b>排行榜</b><br><span style="color:red;">無法連線伺服器</span>';
+        }
+    }
+
+    async function updateLeaderboard(newScore) {
+        const name = prompt('請輸入你的名字（最多8字）', '玩家')?.slice(0,8) || '玩家';
+        await fetch('http://localhost:3000/api/leaderboard', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, score: newScore })
+        });
+        renderLeaderboard();
+    }
+
+    renderLeaderboard();
+
+    function resetGame() {
+        sheeps.length = 0;
+        count = 0;
+        score = 0;
+        timer = 30;
+        countElem.textContent = 0;
+        timerElem.textContent = '時間：' + timer;
+    }
+
+    function startGame() {
+        resetGame();
+        isGameRunning = true;
+        startBtn.disabled = true;
+        timerElem.textContent = '時間：' + timer;
+        intervalId = setInterval(() => {
+            timer--;
+            timerElem.textContent = '時間：' + timer;
+            if (timer <= 0) {
+                endGame();
+            }
+        }, 1000);
+    }
+
+    function endGame() {
+        isGameRunning = false;
+        clearInterval(intervalId);
+        startBtn.disabled = false;
+        timerElem.textContent = '遊戲結束！分數：' + score;
+        updateLeaderboard(score);
+        alert('遊戲結束！你總共點擊了 ' + score + ' 次小羊！');
+    }
+
+    startBtn.addEventListener('click', startGame);
+
+    canvas.addEventListener("click", function (event) {
+        if (!isGameRunning) return;
+        const size = random(40, 200);
+        const imgSrc = sheepImgs[Math.floor(Math.random() * sheepImgs.length)];
+        const angle = random(0, Math.PI * 2);
+        const rotateSpeed = random(0.005, 0.02) * (Math.random() < 0.5 ? 1 : -1);
+        const velX = random(-0.5, 0.5);
+        const velY = random(-0.5, 0.5);
+        sheeps.push(
+            new Sheep(event.clientX, event.clientY, velX, velY, size, imgSrc, angle, rotateSpeed)
+        );
+        count++;
+        score++;
+        countElem.textContent = count;
+        // 隨機播放一個 MP3
+        const audio = new Audio(mp3Files[Math.floor(Math.random() * mp3Files.length)]);
+        audio.play();
+    });
+
+    function loop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (const sheep of sheeps) {
+            sheep.draw();
+            sheep.update();
+            sheep.collisionDetect(sheeps);
+        }
+        requestAnimationFrame(loop);
+    }
+
+    loop();
 
 </script>
 </html>
+
