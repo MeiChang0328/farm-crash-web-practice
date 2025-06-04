@@ -358,6 +358,74 @@
     leaderboardElem.style.zIndex = '10';
     document.body.appendChild(leaderboardElem);
 
+    // 新增「查看所有成績」按鈕
+    const allScoresBtn = document.createElement('button');
+    allScoresBtn.textContent = '查看所有成績';
+    allScoresBtn.style.position = 'fixed';
+    allScoresBtn.style.bottom = '10px';
+    allScoresBtn.style.right = '250px';
+    allScoresBtn.style.fontSize = '1.5em';
+    allScoresBtn.style.background = '#fff8';
+    allScoresBtn.style.border = '2px solid #fff';
+    allScoresBtn.style.borderRadius = '10px';
+    allScoresBtn.style.cursor = 'pointer';
+    allScoresBtn.style.zIndex = '11';
+    document.body.appendChild(allScoresBtn);
+
+    // 浮動視窗顯示所有成績
+    const allScoresModal = document.createElement('div');
+    allScoresModal.style.position = 'fixed';
+    allScoresModal.style.top = '50%';
+    allScoresModal.style.left = '50%';
+    allScoresModal.style.transform = 'translate(-50%, -50%)';
+    allScoresModal.style.background = '#fff';
+    allScoresModal.style.border = '2px solid #888';
+    allScoresModal.style.borderRadius = '12px';
+    allScoresModal.style.padding = '20px 30px';
+    allScoresModal.style.zIndex = '100';
+    allScoresModal.style.display = 'none';
+    allScoresModal.style.maxHeight = '60vh';
+    allScoresModal.style.overflowY = 'auto';
+    document.body.appendChild(allScoresModal);
+
+    const closeModalBtn = document.createElement('button');
+    closeModalBtn.textContent = '關閉';
+    closeModalBtn.style.marginTop = '10px';
+    closeModalBtn.style.fontSize = '1em';
+    closeModalBtn.style.background = '#eee';
+    closeModalBtn.style.border = '1px solid #888';
+    closeModalBtn.style.borderRadius = '6px';
+    closeModalBtn.style.cursor = 'pointer';
+    allScoresModal.appendChild(closeModalBtn);
+    closeModalBtn.addEventListener('click', () => {
+        allScoresModal.style.display = 'none';
+    });
+
+    allScoresBtn.addEventListener('click', async () => {
+        allScoresModal.innerHTML = '<b>所有成績</b><br>載入中...';
+        allScoresModal.appendChild(closeModalBtn);
+        allScoresModal.style.display = 'block';
+        try {
+            const res = await fetch('http://localhost:3000/api/all-scores');
+            if (!res.ok) throw new Error('伺服器無回應');
+            const allScores = await res.json();
+            let html = '<b>所有成績</b><table style="margin-top:10px;border-collapse:collapse;width:100%"><tr><th style="border-bottom:1px solid #888;">玩家</th><th style="border-bottom:1px solid #888;">分數</th><th style="border-bottom:1px solid #888;">時間</th></tr>';
+            if (allScores.length === 0) {
+                html += '<tr><td colspan="3">暫無紀錄</td></tr>';
+            } else {
+                for (const entry of allScores) {
+                    html += `<tr><td>${entry.name}</td><td>${entry.score}</td><td>${entry.time}</td></tr>`;
+                }
+            }
+            html += '</table>';
+            allScoresModal.innerHTML = html;
+            allScoresModal.appendChild(closeModalBtn);
+        } catch (e) {
+            allScoresModal.innerHTML = '<b>所有成績</b><br><span style="color:red;">無法連線伺服器</span>';
+            allScoresModal.appendChild(closeModalBtn);
+        }
+    });
+
     async function renderLeaderboard() {
         try {
             const res = await fetch('http://localhost:3000/api/leaderboard');

@@ -37,6 +37,14 @@ app.post('/api/leaderboard', (req, res) => {
     });
 });
 
+// 取得所有成績
+app.get('/api/all-scores', (req, res) => {
+    db.all('SELECT name, score, time FROM scores ORDER BY score DESC', (err, rows) => {
+        if (err) return res.json([]);
+        res.json(rows);
+    });
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
